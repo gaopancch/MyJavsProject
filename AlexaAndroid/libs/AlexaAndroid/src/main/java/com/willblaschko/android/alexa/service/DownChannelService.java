@@ -61,40 +61,6 @@ public class DownChannelService extends Service {
         pingRunnable = new Runnable() {
             @Override
             public void run() {
-                if(AlexaManager.needTokenCheck) {
-                    TokenManager.getAccessToken(alexaManager.getAuthorizationManager().getAmazonAuthorizationManager(), DownChannelService.this, new TokenManager.TokenCallback() {
-                        @Override
-                        public void onSuccess(String token) {
-
-                            Log.i(TAG, "Sending heartbeat");
-                            final Request request = new Request.Builder()
-                                    .url(alexaManager.getPingUrl())
-                                    .get()
-                                    .addHeader("Authorization", "Bearer " + token)
-                                    .build();
-                            Log.i("LogUtils", "DownChannelService pingRunnable url =" + alexaManager.getPingUrl());
-                            ClientUtil.getTLS12OkHttpClient()
-                                    .newCall(request)
-                                    .enqueue(new Callback() {
-                                        @Override
-                                        public void onFailure(Call call, IOException e) {
-                                            Log.i("LogUtils", "Sending heartbeat onFailure e="+e.getMessage());
-                                        }
-
-                                        @Override
-                                        public void onResponse(Call call, Response response) throws IOException {
-//                                            Log.i("LogUtils", "Sending heartbeat ping success");
-                                            runnableHandler.postDelayed(pingRunnable, 1 * 60 * 1000);
-                                        }
-                                    });
-                        }
-
-                        @Override
-                        public void onFailure(Throwable e) {
-
-                        }
-                    });
-                }else{
                     Log.i("LogUtils", "Sending heartbeat");
                     alexaManager.sendEvent(Event.getSynchronizeStateEvent(), new ImplAsyncCallback<AvsResponse, Exception>() {
                         @Override
@@ -129,7 +95,6 @@ public class DownChannelService extends Service {
                                 }
                             });
                 }
-            }
         };
         
         openDownChannel();
@@ -148,67 +113,6 @@ public class DownChannelService extends Service {
 
 
     private void openDownChannel(){
-        if(AlexaManager.needTokenCheck) {
-            TokenManager.getAccessToken(alexaManager.getAuthorizationManager().getAmazonAuthorizationManager(), DownChannelService.this, new TokenManager.TokenCallback() {
-                @Override
-                public void onSuccess(String token) {
-
-                    OkHttpClient downChannelClient = ClientUtil.getTLS12OkHttpClient();
-                    final Request request = new Request.Builder()
-                            .url(alexaManager.getDirectivesUrl())
-                            .get()
-                            .addHeader("Authorization", "Bearer " + token)
-                            .build();
-                    Log.i("LogUtils", "DownChannelService openDownChannel url =" + alexaManager.getDirectivesUrl());
-                    currentCall = downChannelClient.newCall(request);
-                    currentCall.enqueue(new Callback() {
-                        @Override
-                        public void onFailure(Call call, IOException e) {
-
-                        }
-
-                        @Override
-                        public void onResponse(Call call, Response response) throws IOException {
-
-                            alexaManager.sendEvent(Event.getSynchronizeStateEvent(), new ImplAsyncCallback<AvsResponse, Exception>() {
-                                @Override
-                                public void success(AvsResponse result) {
-                                    handler.handleItems(result);
-                                    runnableHandler.post(pingRunnable);
-                                }
-                            });
-
-                            BufferedSource bufferedSource = response.body().source();
-
-                            while (!bufferedSource.exhausted()) {
-                                String line = bufferedSource.readUtf8Line();
-                                try {
-                                    Directive directive = ResponseParser.getDirective(line);
-                                    handler.handleDirective(directive);
-
-                                    //surface to our UI if it's up
-                                    try {
-                                        AvsItem item = ResponseParser.parseDirective(directive);
-                                        EventBus.getDefault().post(item);
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                } catch (Exception e) {
-                                    Log.e(TAG, "Bad line");
-                                }
-                            }
-
-                        }
-                    });
-
-                }
-
-                @Override
-                public void onFailure(Throwable e) {
-                    e.printStackTrace();
-                }
-            });
-        }else{
 //            Http2Connection
             OkHttpClient downChannelClient = ClientUtil.getTLS12OkHttpClient();
             final Request request = new Request.Builder()
@@ -262,6 +166,5 @@ public class DownChannelService extends Service {
                 }
             });
         }
-    }
 
 }

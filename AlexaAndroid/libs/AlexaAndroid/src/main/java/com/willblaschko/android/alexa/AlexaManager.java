@@ -67,11 +67,8 @@ public class AlexaManager {
         if(productId == null){
             productId = context.getString(R.string.alexa_product_id);
         }
-        if(needTokenCheck) {
-            urlEndpoint = Util.getPreferences(context).getString(KEY_URL_ENDPOINT, context.getString(R.string.alexa_api));
-        }else{
-            urlEndpoint = Util.getPreferences(context).getString(KEY_URL_ENDPOINT, context.getString(R.string.jdsmart_api));
-        }
+        urlEndpoint = Util.getPreferences(context).getString(KEY_URL_ENDPOINT, context.getString(R.string.jdsmart_api));
+
 
         mAuthorizationManager = new AuthorizationManager(mContext, productId);
         mAndroidSystemHandler = AndroidSystemHandler.getInstance(context);
@@ -252,66 +249,6 @@ public class AlexaManager {
      * @param callback the state change callback
      */
     public void sendTextRequest(final String text, @Nullable final AsyncCallback<AvsResponse, Exception> callback){
-        if(needTokenCheck) {
-            //check if the user is already logged in
-            mAuthorizationManager.checkLoggedIn(mContext, new ImplCheckLoggedInCallback() {
-                @Override
-                public void success(Boolean result) {
-                    if (result) {
-                        //if the user is logged in
-
-                        //set our URL
-                        final String url = getEventsUrl();
-                        //do this off the main thread
-                        new AsyncTask<Void, Void, AvsResponse>() {
-                            @Override
-                            protected AvsResponse doInBackground(Void... params) {
-                                //get our access token
-                                TokenManager.getAccessToken(mAuthorizationManager.getAmazonAuthorizationManager(), mContext, new TokenManager.TokenCallback() {
-                                    @Override
-                                    public void onSuccess(String token) {
-
-                                        try {
-                                            getSpeechSendText().sendText(mContext, url, token, text, new AsyncEventHandler(AlexaManager.this, callback));
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                            //bubble up the error
-                                            if (callback != null) {
-                                                callback.failure(e);
-                                            }
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onFailure(Throwable e) {
-
-                                    }
-                                });
-                                return null;
-                            }
-
-
-                            @Override
-                            protected void onPostExecute(AvsResponse avsResponse) {
-                                super.onPostExecute(avsResponse);
-                            }
-                        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                    } else {
-                        //if the user is not logged in, log them in and then call the function again
-                        logIn(new ImplAuthorizationCallback<AvsResponse>(callback) {
-
-                            @Override
-                            public void onSuccess() {
-                                //call our function again
-                                sendTextRequest(text, callback);
-                            }
-
-                        });
-                    }
-                }
-
-            });
-        }else{
             Log.i("LogUtils"," sendText  text = "+text);
             try {
                 getSpeechSendText().sendText(mContext, getEventsUrl(), AlexaManager._token, text, new AsyncEventHandler(AlexaManager.this, callback));
@@ -322,7 +259,6 @@ public class AlexaManager {
                     callback.failure(e);
                 }
             }
-        }
     }
 
 
@@ -348,7 +284,6 @@ public class AlexaManager {
      * @param callback the state change callback
      */
     public void sendAudioRequest(final DataRequestBody requestBody, @Nullable final AsyncCallback<AvsResponse, Exception> callback){
-        if(!AlexaManager.needTokenCheck) {
             new AsyncTask<Void, Void, AvsResponse>() {
                 @Override
                 protected AvsResponse doInBackground(Void... params) {
@@ -369,63 +304,7 @@ public class AlexaManager {
                     super.onPostExecute(avsResponse);
                 }
             }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        }else {
-            //check if the user is already logged in
-            mAuthorizationManager.checkLoggedIn(mContext, new ImplCheckLoggedInCallback() {
 
-                @Override
-                public void success(Boolean result) {
-                    if (result) {
-                        //if the user is logged in
-
-                        //set our URL
-                        final String url = getEventsUrl();
-                        //get our access token
-                        TokenManager.getAccessToken(mAuthorizationManager.getAmazonAuthorizationManager(), mContext, new TokenManager.TokenCallback() {
-                            @Override
-                            public void onSuccess(final String token) {
-                                //do this off the main thread
-                                new AsyncTask<Void, Void, AvsResponse>() {
-                                    @Override
-                                    protected AvsResponse doInBackground(Void... params) {
-                                        try {
-                                            getSpeechSendAudio().sendAudio(url, token, requestBody, new AsyncEventHandler(AlexaManager.this, callback));
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                            //bubble up the error
-                                            if (callback != null) {
-                                                callback.failure(e);
-                                            }
-                                        }
-                                        return null;
-                                    }
-
-                                    @Override
-                                    protected void onPostExecute(AvsResponse avsResponse) {
-                                        super.onPostExecute(avsResponse);
-                                    }
-                                }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                            }
-
-                            @Override
-                            public void onFailure(Throwable e) {
-
-                            }
-                        });
-                    } else {
-                        //if the user is not logged in, log them in and then call the function again
-                        logIn(new ImplAuthorizationCallback<AvsResponse>(callback) {
-                            @Override
-                            public void onSuccess() {
-                                //call our function again
-                                sendAudioRequest(requestBody, callback);
-                            }
-                        });
-                    }
-                }
-
-            });
-        }
     }
 
     public void cancelAudioRequest() {
@@ -539,56 +418,6 @@ public class AlexaManager {
      * @param callback
      */
     public void sendEvent(final String event, final AsyncCallback<AvsResponse, Exception> callback){
-        if(AlexaManager.needTokenCheck) {
-            //check if the user is already logged in
-            mAuthorizationManager.checkLoggedIn(mContext, new ImplCheckLoggedInCallback() {
-
-                @Override
-                public void success(Boolean result) {
-                    if (result) {
-                        //if the user is logged in
-
-                        //set our URL
-                        final String url = getEventsUrl();
-                        //get our access token
-                        TokenManager.getAccessToken(mAuthorizationManager.getAmazonAuthorizationManager(), mContext, new TokenManager.TokenCallback() {
-                            @Override
-                            public void onSuccess(final String token) {
-                                //do this off the main thread
-                                new AsyncTask<Void, Void, AvsResponse>() {
-                                    @Override
-                                    protected AvsResponse doInBackground(Void... params) {
-                                        Log.i(TAG, event);
-                                        new GenericSendEvent(url, token, event, new AsyncEventHandler(AlexaManager.this, callback));
-                                        return null;
-                                    }
-
-                                    @Override
-                                    protected void onPostExecute(AvsResponse avsResponse) {
-                                        super.onPostExecute(avsResponse);
-                                    }
-                                }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                            }
-
-                            @Override
-                            public void onFailure(Throwable e) {
-
-                            }
-                        });
-                    } else {
-                        //if the user is not logged in, log them in and then call the function again
-                        logIn(new ImplAuthorizationCallback<AvsResponse>(callback) {
-                            @Override
-                            public void onSuccess() {
-                                //call our function again
-                                sendEvent(event, callback);
-                            }
-                        });
-                    }
-                }
-
-            });
-        }else {
             new AsyncTask<Void, Void, AvsResponse>() {
                 @Override
                 protected AvsResponse doInBackground(Void... params) {
@@ -602,7 +431,6 @@ public class AlexaManager {
                     super.onPostExecute(avsResponse);
                 }
             }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        }
     }
 
     private boolean isAudioPlayItem (AvsItem item) {
