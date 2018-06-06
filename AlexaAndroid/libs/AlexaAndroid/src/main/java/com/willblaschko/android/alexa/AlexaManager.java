@@ -45,9 +45,9 @@ import static com.willblaschko.android.alexa.utility.Util.IDENTIFIER;
 public class AlexaManager {
 
     public static final boolean needTokenCheck = false;//true时候每次请求都需要token验证，登录状态验证
-    public static String _token = "";
-    public static String _deviceid="";
-    public static String _appkey = "";
+    public static String _token = "tokentest";
+    public static String _deviceid="gaopan23";
+    public static String _appkey = "9988jjhdhdhd";
     private static final String TAG = "AlexaManager";
     private static final String KEY_URL_ENDPOINT = "url_endpoint";
 

@@ -96,16 +96,16 @@ public class DownChannelService extends Service {
                     });
                 }else{
                     Log.i("LogUtils", "Sending heartbeat");
-//                    alexaManager.sendEvent(Event.getSynchronizeStateEvent(), new ImplAsyncCallback<AvsResponse, Exception>() {
-//                        @Override
-//                        public void success(AvsResponse result) {
-////                            handler.handleItems(result);
-////                            Log.i("LogUtils", "downChannelClient result ="+result);
-//                            runnableHandler.postDelayed(pingRunnable, 1 * 20 * 1000);
-//                        }
-//                    });
-//                    if(true)
-//                    return;
+                    alexaManager.sendEvent(Event.getSynchronizeStateEvent(), new ImplAsyncCallback<AvsResponse, Exception>() {
+                        @Override
+                        public void success(AvsResponse result) {
+//                            handler.handleItems(result);
+//                            Log.i("LogUtils", "downChannelClient result ="+result);
+                            runnableHandler.postDelayed(pingRunnable, 1 * 60 * 1000);
+                        }
+                    });
+                    if(true)
+                    return;
                     final Request request = new Request.Builder()
                             .url(alexaManager.getPingUrl())
                             .get()
