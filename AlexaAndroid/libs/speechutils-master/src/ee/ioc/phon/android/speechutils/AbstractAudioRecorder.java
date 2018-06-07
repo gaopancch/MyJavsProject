@@ -185,12 +185,14 @@ public abstract class AbstractAudioRecorder implements AudioRecorder {
     public synchronized byte[] consumeRecording() {
         byte[] bytes = getCurrentRecording(mConsumedLength);
         mConsumedLength +=320;
-        Log.i("LogUtils","btyes length ="+bytes.length);
+//        mConsumedLength = mRecordedLength;
+//        Log.i("LogUtils","btyes length ="+bytes.length);
         return bytes;
     }
 
     protected byte[] getCurrentRecording(int startPos) {
         int len = 320;
+//        len = getLength() - startPos;
 //        if(getLength()<startPos+320){
 //            len = getLength() - startPos;
 //        }
@@ -199,7 +201,7 @@ public abstract class AbstractAudioRecorder implements AudioRecorder {
 //        }
         byte[] bytes = new byte[len];
         System.arraycopy(mRecording, startPos, bytes, 0, len);
-        android.util.Log.i("LogUtils", "bytes.length = "+bytes.length);
+//        android.util.Log.i("LogUtils", "bytes.length = "+bytes.length);
         return bytes;
     }
 

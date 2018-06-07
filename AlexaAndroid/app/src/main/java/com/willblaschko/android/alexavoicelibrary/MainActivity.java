@@ -1,13 +1,20 @@
 package com.willblaschko.android.alexavoicelibrary;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.willblaschko.android.alexa.AlexaManager;
 import com.willblaschko.android.alexavoicelibrary.actions.ActionsFragment;
 import com.willblaschko.android.alexavoicelibrary.actions.BaseListenerFragment;
 
@@ -24,13 +31,21 @@ public class MainActivity extends BaseActivity implements ActionsFragment.Action
     private TextView status;
     private View loading;
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this,new String[]{
+                    Manifest.permission.READ_EXTERNAL_STORAGE},1);
+        }
         //Listen for changes in the back stack
         getSupportFragmentManager().addOnBackStackChangedListener(this);
         //Handle when activity is recreated like on orientation Change

@@ -133,13 +133,17 @@ public class SendAudioActionFragment extends BaseListenerFragment {
                     }
                     if(sink != null && recorder != null) {
                         byte[] consumeRecordBytes = recorder.consumeRecording();
-                        if(consumeRecordBytes.length<=320&&consumeRecordBytes.length>0){
+//                        if(consumeRecordBytes.length<=320&&consumeRecordBytes.length>0){
+                        if(consumeRecordBytes.length>0) {
+                            android.util.Log.i("LogUtils", "bytes.length = "+consumeRecordBytes.length);
                             sink.write(consumeRecordBytes);
-                            //每次write 320bytes只有，直接flush ？
                             sink.flush();
-                        }else{
-                            Log.i("LogUtils", "do not == 320------------------------ ");
                         }
+                            //每次write 320bytes只有，直接flush ？
+//                            sink.flush();
+//                        }else{
+//                            Log.i("LogUtils", "do not == 320------------------------ ");
+//                        }
                     }
                     if(BuildConfig.DEBUG){
                         Log.i(TAG, "Received audio");
