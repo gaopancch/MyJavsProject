@@ -55,6 +55,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-base:9.6.1'
     testCompile 'junit:junit:4.12'
     compile files('libs/okio-1.9.0.jar')
+    compile project(path: ':libs:speechutils-master')
 }
 
 android {

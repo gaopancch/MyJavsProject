@@ -2,6 +2,9 @@ package com.willblaschko.android.alexavoicelibrary.actions;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.media.AudioFormat;
+import android.media.AudioManager;
+import android.media.AudioTrack;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,9 +14,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.willblaschko.android.alexa.requestbody.DataRequestBody;
 import com.willblaschko.android.alexavoicelibrary.BuildConfig;
+import com.willblaschko.android.alexavoicelibrary.FileUtils;
 import com.willblaschko.android.alexavoicelibrary.R;
 import com.willblaschko.android.recorderview.RecorderView;
 
@@ -36,7 +41,8 @@ public class SendAudioActionFragment extends BaseListenerFragment {
     private static final int AUDIO_RATE = 16000;
     private RawAudioRecorder recorder;
     private RecorderView recorderView;
-
+    private int bufferSize;// = AudioTrack.getMinBufferSize(16000,AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
+    private AudioTrack audioTrack;//= new AudioTrack(AudioManager.STREAM_MUSIC, 16000, AudioFormat.CHANNEL_OUT_MONO,AudioFormat.ENCODING_PCM_16BIT, bufferSize, AudioTrack.MODE_STREAM);
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -47,14 +53,25 @@ public class SendAudioActionFragment extends BaseListenerFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         recorderView = (RecorderView) view.findViewById(R.id.recorder);
+        bufferSize = AudioTrack.getMinBufferSize(16000,AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
         recorderView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(recorder == null) {
+                    recodeBytes = null;
                     startListening();
                 }else{
                     stopListening();
                 }
+            }
+        });
+        view.findViewById(R.id.button_speak).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                audioTrack= new AudioTrack(AudioManager.STREAM_MUSIC, 16000, AudioFormat.CHANNEL_OUT_MONO,AudioFormat.ENCODING_PCM_16BIT, bufferSize, AudioTrack.MODE_STREAM);
+                audioTrack.play();
+                audioTrack.write(recodeBytes, 0, recodeBytes.length);
+
             }
         });
     }
@@ -111,6 +128,8 @@ public class SendAudioActionFragment extends BaseListenerFragment {
         alexaManager.sendAudioRequest(requestBody, getRequestCallback());
     }
 
+    byte[] recodeBytes = null;
+    byte[] recdeBytesTem = null;
     private DataRequestBody requestBody = new DataRequestBody() {
         /**
          * @param sink
@@ -135,15 +154,18 @@ public class SendAudioActionFragment extends BaseListenerFragment {
                         byte[] consumeRecordBytes = recorder.consumeRecording();
 //                        if(consumeRecordBytes.length<=320&&consumeRecordBytes.length>0){
                         if(consumeRecordBytes.length>0) {
+                            if(recodeBytes == null){
+                                recodeBytes = consumeRecordBytes;
+                            }else{
+                                recdeBytesTem = recodeBytes;
+                                recodeBytes = new byte[recdeBytesTem.length + consumeRecordBytes.length];
+                                System.arraycopy(recdeBytesTem,0,recodeBytes,0,recdeBytesTem.length);
+                                System.arraycopy(consumeRecordBytes,0,recodeBytes,recdeBytesTem.length,consumeRecordBytes.length);
+                            }
                             android.util.Log.i("LogUtils", "bytes.length = "+consumeRecordBytes.length);
                             sink.write(consumeRecordBytes);
                             sink.flush();
                         }
-                            //每次write 320bytes只有，直接flush ？
-//                            sink.flush();
-//                        }else{
-//                            Log.i("LogUtils", "do not == 320------------------------ ");
-//                        }
                     }
                     if(BuildConfig.DEBUG){
                         Log.i(TAG, "Received audio");
@@ -162,7 +184,17 @@ public class SendAudioActionFragment extends BaseListenerFragment {
 
     };
 
+    /**
+     *
+     */
     private void stopListening(){
+        byte[] data1 = recorder.getCompleteRecordingAsWav();
+//        byte[] data2 = recodeBytes;
+        FileUtils.playWav(data1,"aaSpeech.wav",false);
+//        data3 = new byte[data1.length+data2.length];
+//        System.arraycopy(data1,0,data3,0,data1.length);
+//        System.arraycopy(data2,0,data3,data1.length,data2.length);
+//        FileUtils.playWav(data3,"aaRecoder.wav",false);
         if(recorder != null) {
             recorder.stop();
             recorder.release();

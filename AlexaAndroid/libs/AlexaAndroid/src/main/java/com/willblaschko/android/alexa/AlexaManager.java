@@ -3,6 +3,7 @@ package com.willblaschko.android.alexa;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 
 import com.willblaschko.android.alexa.callbacks.AsyncCallback;
@@ -30,6 +31,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+
+import ee.ioc.phon.android.speechutils.TtsProvider;
 import okio.BufferedSink;
 
 import static com.willblaschko.android.alexa.AuthorizationManager.createCodeVerifier;
@@ -61,9 +64,16 @@ public class AlexaManager {
     private String urlEndpoint;
     private Context mContext;
     private boolean mIsRecording = false;
+    private TtsProvider ttsProvider;
 
     private AlexaManager(Context context, String productId){
         mContext = context.getApplicationContext();
+         ttsProvider = new TtsProvider(mContext, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+//                Log.i("LogUtils","onInit status = "+status);
+            }
+        });
         if(productId == null){
             productId = context.getString(R.string.alexa_product_id);
         }
@@ -643,7 +653,7 @@ public class AlexaManager {
 
 
 
-    public static class AsyncEventHandler implements AsyncCallback<Call, Exception>{
+    public class AsyncEventHandler implements AsyncCallback<Call, Exception>{
 
         AsyncCallback<AvsResponse, Exception> callback;
         AlexaManager manager;
@@ -668,6 +678,7 @@ public class AlexaManager {
                 Log.i("LogUtils","AsyncEventHandler success response="+response.toString());
                 if(response.code() == HttpURLConnection.HTTP_NO_CONTENT){
                     Log.i("LogUtils", "Received a 204 response code from Amazon, is this expected?");
+//                    ttsProvider.say("服务端说没收到发的数据，你是在逗我吗？");
                 }
 
                 final AvsResponse items = response.code() == HttpURLConnection.HTTP_NO_CONTENT ? new AvsResponse() :

@@ -219,7 +219,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseList
         @Override
         public void start() {
             startTime = System.currentTimeMillis();
-            LogUtils.log("Event Start");
+            LogUtils.log("Event Start------");
             setState(STATE_PROCESSING);
         }
 
@@ -343,7 +343,9 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseList
             //listen for user input
             audioPlayer.stop();
             avsQueue.clear();
-            startListening();
+            //一般这里回复“我没听明白，然后自动进入拾音状态，暂时注释”
+//            startListening();
+            setState(STATE_FINISHED);
         } else if (current instanceof AvsSetVolumeItem) {
             //set our volume
             setVolume(((AvsSetVolumeItem) current).getVolume());

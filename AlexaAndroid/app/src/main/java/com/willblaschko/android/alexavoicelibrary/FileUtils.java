@@ -1,6 +1,7 @@
 package com.willblaschko.android.alexavoicelibrary;
 
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.os.Environment;
 import android.os.StatFs;
 import android.util.Log;
@@ -705,6 +706,37 @@ public class FileUtils {
             e.printStackTrace();
         }
         return result;
+    }
+
+    public static void playWav(byte[] wavSoundByteArray, String fileName,boolean isPlay) {
+        try {
+            // create temp file that will hold byte array
+            File tempWav = new File(Environment.getExternalStorageDirectory(),
+                    fileName);
+            tempWav.deleteOnExit();
+            FileOutputStream fos = new FileOutputStream(tempWav);
+            fos.write(wavSoundByteArray);
+            fos.close();
+
+            // Tried reusing instance of media player
+            // but that resulted in system crashes...
+            if(isPlay) {
+                MediaPlayer mediaPlayer = new MediaPlayer();
+
+                // Tried passing path directly, but kept getting
+                // "Prepare failed.: status=0x1"
+                // so using file descriptor instead
+                FileInputStream fis = new FileInputStream(tempWav);
+                mediaPlayer.setDataSource(fis.getFD());
+
+                mediaPlayer.prepare();
+                mediaPlayer.start();
+            }
+        } catch (IOException ex) {
+            String s = ex.toString();
+            Log.i("gaopan123"," exception s= "+s);
+            ex.printStackTrace();
+        }
     }
 }
 

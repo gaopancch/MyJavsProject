@@ -17,7 +17,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="60dp"
-            android:text="你好"
+            android:text="今天是星期几"
             android:hint="你好"
             android:background="@drawable/background_edittext"
             android:id="@+id/search"
