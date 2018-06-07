@@ -65,7 +65,6 @@ public class DownChannelService extends Service {
                     TokenManager.getAccessToken(alexaManager.getAuthorizationManager().getAmazonAuthorizationManager(), DownChannelService.this, new TokenManager.TokenCallback() {
                         @Override
                         public void onSuccess(String token) {
-
                             Log.i(TAG, "Sending heartbeat");
                             final Request request = new Request.Builder()
                                     .url(alexaManager.getPingUrl())
