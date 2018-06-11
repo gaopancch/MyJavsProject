@@ -188,14 +188,10 @@ public class SendAudioActionFragment extends BaseListenerFragment {
      *
      */
     private void stopListening(){
-        byte[] data1 = recorder.getCompleteRecordingAsWav();
-//        byte[] data2 = recodeBytes;
-        FileUtils.playWav(data1,"aaSpeech.wav",false);
-//        data3 = new byte[data1.length+data2.length];
-//        System.arraycopy(data1,0,data3,0,data1.length);
-//        System.arraycopy(data2,0,data3,data1.length,data2.length);
-//        FileUtils.playWav(data3,"aaRecoder.wav",false);
         if(recorder != null) {
+            byte[] data1 = recorder.getCompleteRecordingAsWav();
+//        byte[] data2 = recodeBytes;
+            FileUtils.playWav(data1,"aaSpeech.wav",false);
             recorder.stop();
             recorder.release();
             recorder = null;

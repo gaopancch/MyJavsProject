@@ -45,10 +45,10 @@ public abstract class SendEvent {
         //set the request URL
         mRequestBuilder.url(url);
         //set our authentication access token header
-        mRequestBuilder.addHeader("Authorization", "Bearer " + accessToken);
+        mRequestBuilder.addHeader("Authorization", AlexaManager._token);
         if(!AlexaManager.needTokenCheck) {
-            mRequestBuilder.addHeader("device-id", "gaopan27");
-            mRequestBuilder.addHeader("app-key", "F8D5EFE9A98F486AAC39EC1B401E1D73");
+            mRequestBuilder.addHeader("device-id", AlexaManager._deviceid);
+            mRequestBuilder.addHeader("app-key", AlexaManager._appkey);
         }
         String event = getEvent();
         Log.i("LogUtils","sendEvent event ="+event);

@@ -115,6 +115,7 @@ class AndroidPlatform extends Platform {
     if (!getAlpnSelectedProtocol.isSupported(socket)) return null;
 
     byte[] alpnResult = (byte[]) getAlpnSelectedProtocol.invokeWithoutCheckedException(socket);
+    Log.i("alpn","alpnResult = "+alpnResult);
     return alpnResult != null ? new String(alpnResult, Util.UTF_8) : null;
   }
 

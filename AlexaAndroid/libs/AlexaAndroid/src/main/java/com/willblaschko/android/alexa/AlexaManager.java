@@ -49,7 +49,7 @@ public class AlexaManager {
 
     public static final boolean needTokenCheck = false;//true时候每次请求都需要token验证，登录状态验证
     public static String _token = "tokentest";
-    public static String _deviceid="gaopan23";
+    public static String _deviceid="gaopan555";
     public static String _appkey = "9988jjhdhdhd";
     private static final String TAG = "AlexaManager";
     private static final String KEY_URL_ENDPOINT = "url_endpoint";
@@ -363,6 +363,7 @@ public class AlexaManager {
                 @Override
                 protected AvsResponse doInBackground(Void... params) {
                     try {
+                        Log.i("LogUtils", "sendAudioRequest 360");
                         getSpeechSendAudio().sendAudio(getEventsUrl(), AlexaManager._token, requestBody, new AsyncEventHandler(AlexaManager.this, callback));
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -691,7 +692,8 @@ public class AlexaManager {
                 if (callback != null) {
                     callback.success(items);
                 }
-            } catch (IOException|AvsException e) {
+            } catch (Exception e) {
+                ttsProvider.say("异常，请重试");
                 Log.i("LogUtils","AsyncEventHandler exception ="+e.getMessage());
                 if (!currentCall.isCanceled()) {
                     if (callback != null) {
@@ -704,6 +706,7 @@ public class AlexaManager {
         @Override
         public void failure(Exception error) {
             //bubble up the error
+            Log.i("LogUtils","AsyncEventHandler failure error ="+error.getMessage());
             if (callback != null) {
                 callback.failure(error);
             }
@@ -711,7 +714,7 @@ public class AlexaManager {
 
         @Override
         public void complete() {
-
+            Log.i("LogUtils","AsyncEventHandler complete");
             if (callback != null) {
                 callback.complete();
             }

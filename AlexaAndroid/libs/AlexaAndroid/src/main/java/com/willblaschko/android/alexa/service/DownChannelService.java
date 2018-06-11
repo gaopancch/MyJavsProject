@@ -94,17 +94,7 @@ public class DownChannelService extends Service {
                         }
                     });
                 }else{
-                    Log.i("LogUtils", "Sending heartbeat");
-                    alexaManager.sendEvent(Event.getSynchronizeStateEvent(), new ImplAsyncCallback<AvsResponse, Exception>() {
-                        @Override
-                        public void success(AvsResponse result) {
-//                            handler.handleItems(result);
-//                            Log.i("LogUtils", "downChannelClient result ="+result);
-                            runnableHandler.postDelayed(pingRunnable, 1 * 60 * 1000);
-                        }
-                    });
-                    if(true)
-                    return;
+                    Log.i("LogUtils", "Sending heartbeat--");
                     final Request request = new Request.Builder()
                             .url(alexaManager.getPingUrl())
                             .get()
@@ -112,7 +102,6 @@ public class DownChannelService extends Service {
                             .addHeader("device-id",AlexaManager._deviceid)
                             .addHeader("app-key",AlexaManager._appkey)
                             .build();
-                    Log.i("LogUtils", "DownChannelService pingRunnable url= =" + alexaManager.getPingUrl());
                     ClientUtil.getTLS12OkHttpClient()
                             .newCall(request)
                             .enqueue(new Callback() {
@@ -123,7 +112,7 @@ public class DownChannelService extends Service {
 
                                 @Override
                                 public void onResponse(Call call, Response response) throws IOException {
-                                    Log.i("LogUtils", "Sending heartbeat ping success");
+                                    Log.i("LogUtils", "ping success response = "+response.toString());
                                     runnableHandler.postDelayed(pingRunnable, 1 * 60 * 1000);
                                 }
                             });
@@ -193,7 +182,7 @@ public class DownChannelService extends Service {
                                         e.printStackTrace();
                                     }
                                 } catch (Exception e) {
-                                    Log.e(TAG, "Bad line");
+                                    Log.e(TAG, "Bad line e ="+e.getMessage());
                                 }
                             }
 
@@ -253,8 +242,7 @@ public class DownChannelService extends Service {
                                 e.printStackTrace();
                             }
                         } catch (Exception e) {
-                            Log.e("LogUtils", "Bad line");
-                            Log.i("LogUtils", "Bad line");
+                            Log.e(TAG, "256 Bad line e ="+e.getMessage());
                         }
                     }
 

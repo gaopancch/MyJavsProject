@@ -2,6 +2,7 @@ package com.willblaschko.android.alexavoicelibrary;
 
 import android.app.Instrumentation;
 import android.content.Context;
+import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -34,6 +35,7 @@ import com.willblaschko.android.alexa.interfaces.speaker.AvsSetMuteItem;
 import com.willblaschko.android.alexa.interfaces.speaker.AvsSetVolumeItem;
 import com.willblaschko.android.alexa.interfaces.speechrecognizer.AvsExpectSpeechItem;
 import com.willblaschko.android.alexa.interfaces.speechsynthesizer.AvsSpeakItem;
+import com.willblaschko.android.alexa.service.DownChannelService;
 import com.willblaschko.android.alexavoicelibrary.actions.BaseListenerFragment;
 import com.willblaschko.android.alexavoicelibrary.global.LogUtils;
 
@@ -85,6 +87,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseList
             audioPlayer.removeCallback(alexaAudioPlayerCallback);
             audioPlayer.release();
         }
+        getApplicationContext().stopService(new Intent(getApplicationContext(), DownChannelService.class));
     }
 
 
@@ -154,7 +157,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseList
 
         @Override
         public void itemComplete(AvsItem completedItem) {
-            LogUtils.log("itemComplete ");
+            LogUtils.log("itemComplete completedItem ="+completedItem.toString());
             almostDoneFired = false;
             playbackStartedFired = false;
             avsQueue.remove(completedItem);
@@ -170,7 +173,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseList
 
         @Override
         public boolean playerError(AvsItem item, int what, int extra) {
-            LogUtils.log("playerError ");
+            LogUtils.log("playerError what = "+what + " extra = "+extra);
             return false;
         }
 
@@ -339,7 +342,6 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseList
             //mAvsItemQueue.clear();
             avsQueue.remove(current);
         } else if (current instanceof AvsExpectSpeechItem) {
-
             //listen for user input
             audioPlayer.stop();
             avsQueue.clear();

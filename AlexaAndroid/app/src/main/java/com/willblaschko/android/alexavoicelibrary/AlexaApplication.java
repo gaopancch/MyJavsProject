@@ -25,7 +25,6 @@ public class AlexaApplication extends Application {
         super.onCreate();
         mInstance = this;
         AlexaManager._appkey = "A8064DFC0B834B7FA5A2F92B005FB27A";
-        AlexaManager._deviceid = "12345678";
 
         AlexaManager._token = FileUtils.readFileFromSd("access_token.txt");
         if(TextUtils.isEmpty(AlexaManager._token)){
