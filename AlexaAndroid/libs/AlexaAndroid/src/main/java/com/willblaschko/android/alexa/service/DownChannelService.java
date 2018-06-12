@@ -112,7 +112,7 @@ public class DownChannelService extends Service {
 
                                 @Override
                                 public void onResponse(Call call, Response response) throws IOException {
-                                    Log.i("LogUtils", "ping success response = "+response.toString());
+//                                    Log.i("LogUtils", "ping success response = "+response.toString());
                                     runnableHandler.postDelayed(pingRunnable, 1 * 60 * 1000);
                                 }
                             });

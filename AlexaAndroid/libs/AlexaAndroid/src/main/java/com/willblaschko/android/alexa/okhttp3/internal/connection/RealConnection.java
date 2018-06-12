@@ -202,7 +202,6 @@ public final class RealConnection extends Http2Connection.Listener implements Co
       socket = rawSocket;
     }
 
-    //云端有问题，只能强制使协议为HTTP2
     if(!AlexaManager.needTokenCheck){
       protocol = Protocol.HTTP_2;
     }

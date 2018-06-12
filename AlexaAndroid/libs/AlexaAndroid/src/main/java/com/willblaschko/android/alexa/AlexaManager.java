@@ -380,7 +380,7 @@ public class AlexaManager {
                     super.onPostExecute(avsResponse);
                 }
             }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        }else {
+        } else {
             //check if the user is already logged in
             mAuthorizationManager.checkLoggedIn(mContext, new ImplCheckLoggedInCallback() {
 
@@ -678,7 +678,6 @@ public class AlexaManager {
                 Response response = currentCall.execute();
                 Log.i("LogUtils","AsyncEventHandler success response="+response.toString());
                 if(response.code() == HttpURLConnection.HTTP_NO_CONTENT){
-                    Log.i("LogUtils", "Received a 204 response code from Amazon, is this expected?");
 //                    ttsProvider.say("服务端说没收到发的数据，你是在逗我吗？");
                 }
 

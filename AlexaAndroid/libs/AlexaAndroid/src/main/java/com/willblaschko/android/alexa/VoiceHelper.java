@@ -7,10 +7,14 @@ import android.util.Log;
 
 import org.apache.commons.io.FileUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Handler;
 
 /**
  * A helper class that utilizes the TextToSpeech engine built into Android to turn a string-based AVS intent
@@ -26,23 +30,9 @@ public class VoiceHelper{
     private static VoiceHelper mInstance;
     private Context mContext;
     private TextToSpeech mTextToSpeech;
-    private static boolean mIsIntialized = false;
+
 
     Map<String, SpeechFromTextCallback> mCallbacks = new HashMap<>();
-    static {
-        mInitListener = new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status) {
-                if(status == TextToSpeech.SUCCESS){
-                    Log.i("LogUtils", " initialize Text to Speech engine");
-                    mIsIntialized = true;
-                }else{
-                    Log.i("LogUtils", "Unable to initialize Text to Speech engine");
-                    new IllegalStateException("Unable to initialize Text to Speech engine").printStackTrace();
-                }
-            }
-        };
-    }
 
     /**
      * Initalize our TextToSpeech engine, use a few tricks to get it to use a smaller file size
@@ -51,9 +41,20 @@ public class VoiceHelper{
      */
     private VoiceHelper(Context context){
         mContext = context.getApplicationContext();
-        mTextToSpeech = new TextToSpeech(mContext, mInitListener);
-        mTextToSpeech.setPitch(.8f);
-        mTextToSpeech.setSpeechRate(1.3f);
+        final long start = System.currentTimeMillis();
+        mTextToSpeech = new TextToSpeech(mContext, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status == TextToSpeech.SUCCESS) {
+                    Log.i("LogUtils", " initialize Text to Speech engine "+(System.currentTimeMillis()-start));
+                } else {
+                    Log.i("LogUtils", "Unable to initialize Text to Speech engine");
+                    new IllegalStateException("Unable to initialize Text to Speech engine").printStackTrace();
+                }
+            }
+        });
+//        mTextToSpeech.setPitch(.8f);
+//        mTextToSpeech.setSpeechRate(1.3f);
         mTextToSpeech.setOnUtteranceProgressListener(mUtteranceProgressListener);
     }
 
@@ -71,10 +72,6 @@ public class VoiceHelper{
         return mInstance;
     }
 
-    /**
-     * Our TextToSpeech Init state changed listener
-     */
-    private static TextToSpeech.OnInitListener mInitListener ;
 
     /**
      * Our TextToSpeech UtteranceProgress state changed listener
@@ -83,7 +80,7 @@ public class VoiceHelper{
     private UtteranceProgressListener mUtteranceProgressListener = new UtteranceProgressListener() {
         @Override
         public void onStart(String utteranceId) {
-
+//            Log.i("LogUtils","UtteranceProgressListener onStart utteranceId = "+utteranceId);
         }
 
         @Override
@@ -96,7 +93,7 @@ public class VoiceHelper{
                 try {
                     byte[] data = FileUtils.readFileToByteArray(cacheFile);
                     callback.onSuccess(data);
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     //bubble up our error
                     callback.onError(e);
@@ -128,27 +125,32 @@ public class VoiceHelper{
     };
 
     /**
+     * 调用这个方法时候需要加延迟，等待TextToSpeech初始化完成 50ms
      * Create a new audio recording based on text passed in, update the callback with the changing states
      * @param text the text to render
      * @param callback
      */
-    public void getSpeechFromText(String text, SpeechFromTextCallback callback){
+    public void getSpeechFromText(final String text, final SpeechFromTextCallback callback){
+        new android.os.Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                //        //create a new unique ID
+                String utteranceId = System.currentTimeMillis()+"";
 
-        //create a new unique ID
-        String utteranceId = AuthorizationManager.createCodeVerifier();
+                //add the callback to our list of callbacks
+                mCallbacks.put(utteranceId, callback);
 
-        //add the callback to our list of callbacks
-        mCallbacks.put(utteranceId, callback);
-
-        //get our TextToSpeech engine
-        TextToSpeech textToSpeech = getTextToSpeech();
-
-        //set up our arguments
-        HashMap<String, String> params = new HashMap<>();
-        params.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, utteranceId);
-
-        //request an update from TTS
-        textToSpeech.synthesizeToFile(text, params, getCacheFile(utteranceId).toString());
+                //get our TextToSpeech engine
+                TextToSpeech textToSpeech = getTextToSpeech();
+                //set up our arguments
+                HashMap<String, String> params = new HashMap<>();
+                params.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, utteranceId);
+//        textToSpeech.speak("白日衣裳尽",
+//                TextToSpeech.QUEUE_ADD, null);
+                //request an update from TTS
+                textToSpeech.synthesizeToFile(text, params, getCacheFile(utteranceId).toString());
+            }
+        },50);
     }
 
     /**
@@ -156,33 +158,22 @@ public class VoiceHelper{
      * @return our TextToSpeech instance, if it's initialized
      */
     private TextToSpeech getTextToSpeech(){
-        int count = 0;
-//        if (mInitListener == null) {
-//            mInitListener = new TextToSpeech.OnInitListener() {
-//                @Override
-//                public void onInit(int status) {
-//                    if (status == TextToSpeech.SUCCESS) {
-//                        Log.i("LogUtils", " initialize Text to Speech engine");
-//                        mIsIntialized = true;
-//                    } else {
-//                        Log.i("LogUtils", "Unable to initialize Text to Speech engine");
-//                        new IllegalStateException("Unable to initialize Text to Speech engine").printStackTrace();
-//                    }
-//                }
-//            };
-//        }
-//        while(!mIsIntialized){
-//            if(count < 100) {
-//                count++;
-//                try {
-//                    Thread.sleep(10);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }else{
-//                throw new IllegalStateException("Text to Speech engine is not initalized");
-//            }
-//        }
+        if(mTextToSpeech == null) {
+            mTextToSpeech = new TextToSpeech(mContext, new TextToSpeech.OnInitListener() {
+                @Override
+                public void onInit(int status) {
+                    if (status == TextToSpeech.SUCCESS) {
+                        Log.i("LogUtils", " initialize Text to Speech engine");
+                    } else {
+                        Log.i("LogUtils", "Unable to initialize Text to Speech engine");
+                        new IllegalStateException("Unable to initialize Text to Speech engine").printStackTrace();
+                    }
+                }
+            });
+//            mTextToSpeech.setPitch(.8f);
+//            mTextToSpeech.setSpeechRate(1.3f);
+            mTextToSpeech.setOnUtteranceProgressListener(mUtteranceProgressListener);
+        }
         return mTextToSpeech;
     }
 

@@ -4,9 +4,9 @@ import java.util.List;
 
 public class Log {
 
-    public static final boolean DEBUG = BuildConfig.DEBUG;
+    public static final boolean DEBUG = false;
 
-    public static final String LOG_TAG = "speechutils";
+    public static final String LOG_TAG = "LogUtils";
 
     public static void i(String msg) {
         if (DEBUG) android.util.Log.i(LOG_TAG, msg);

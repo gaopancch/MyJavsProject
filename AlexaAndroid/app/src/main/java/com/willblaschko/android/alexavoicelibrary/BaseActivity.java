@@ -259,6 +259,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseList
      */
     private void handleResponse(AvsResponse response){
         boolean checkAfter = (avsQueue.size() == 0);
+        Log.i("LogUtils","handleResponse AvsResponse =" +response);
         if(response != null){
             //if we have a clear queue item in the list, we need to clear the current queue before proceeding
             //iterate backwards to avoid changing our array positions and getting all the nasty errors that come
@@ -345,7 +346,6 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseList
             //listen for user input
             audioPlayer.stop();
             avsQueue.clear();
-            //一般这里回复“我没听明白，然后自动进入拾音状态，暂时注释”
 //            startListening();
             setState(STATE_FINISHED);
         } else if (current instanceof AvsSetVolumeItem) {

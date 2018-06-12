@@ -113,7 +113,8 @@ public abstract class AbstractAudioRecorder implements AudioRecorder {
     protected int getStatus(int numOfBytes, int len) {
         Log.i("Read bytes: request/actual: " + len + "/" + numOfBytes);
         if (numOfBytes < 0) {
-            Log.e("AudioRecord error: " + numOfBytes);
+            Log.i("AudioRecord error: " + numOfBytes);
+            android.util.Log.i("LogUtils","numOfBytes ="+numOfBytes);
             return numOfBytes;
         }
         if (numOfBytes > len) {
@@ -369,6 +370,7 @@ public abstract class AbstractAudioRecorder implements AudioRecorder {
 
 
     protected void handleError(String msg) {
+        android.util.Log.i("LogUtils","recoder handleError msg = "+msg);
         release();
         setState(State.ERROR);
         Log.e(msg);

@@ -183,7 +183,7 @@ public class ResponseParser {
     }
 
     public static AvsItem parseDirective(Directive directive, HashMap<String, ByteArrayInputStream> audio) throws IOException {
-        Log.i(TAG, "Parsing directive type: "+directive.getHeader().getNamespace()+":"+directive.getHeader().getName());
+        Log.i("LogUtils", "Parsing directive type: "+directive.getHeader().getNamespace()+":"+directive.getHeader().getName());
         switch (directive.getHeader().getName()) {
             case Directive.TYPE_SPEAK:
                 String cid = directive.getPayload().getUrl();

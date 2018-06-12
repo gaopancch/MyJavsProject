@@ -6,6 +6,7 @@ import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -16,6 +17,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.willblaschko.android.alexa.VoiceHelper;
+import com.willblaschko.android.alexa.interfaces.AvsException;
 import com.willblaschko.android.alexa.requestbody.DataRequestBody;
 import com.willblaschko.android.alexavoicelibrary.BuildConfig;
 import com.willblaschko.android.alexavoicelibrary.FileUtils;
@@ -43,6 +46,7 @@ public class SendAudioActionFragment extends BaseListenerFragment {
     private RecorderView recorderView;
     private int bufferSize;// = AudioTrack.getMinBufferSize(16000,AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT);
     private AudioTrack audioTrack;//= new AudioTrack(AudioManager.STREAM_MUSIC, 16000, AudioFormat.CHANNEL_OUT_MONO,AudioFormat.ENCODING_PCM_16BIT, bufferSize, AudioTrack.MODE_STREAM);
+    VoiceHelper voiceHelper;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -71,6 +75,23 @@ public class SendAudioActionFragment extends BaseListenerFragment {
                 audioTrack= new AudioTrack(AudioManager.STREAM_MUSIC, 16000, AudioFormat.CHANNEL_OUT_MONO,AudioFormat.ENCODING_PCM_16BIT, bufferSize, AudioTrack.MODE_STREAM);
                 audioTrack.play();
                 audioTrack.write(recodeBytes, 0, recodeBytes.length);
+//                 voiceHelper = VoiceHelper.getInstance(getContext());
+//                String text = "... " + "白日依山尽" + " ...";
+//                voiceHelper.getSpeechFromText(text, new VoiceHelper.SpeechFromTextCallback() {
+//                    @Override
+//                    public void onSuccess(byte[] data) {
+//                        Log.i("LogUtils", "onSuccess ");
+//                        audioTrack= new AudioTrack(AudioManager.STREAM_MUSIC, 16000, AudioFormat.CHANNEL_OUT_MONO,AudioFormat.ENCODING_PCM_16BIT, bufferSize, AudioTrack.MODE_STREAM);
+//                        audioTrack.play();
+//                        audioTrack.write(data, 0, data.length);
+////                        audioTrack.write(recodeBytes, 0, recodeBytes.length);
+//                    }
+//
+//                    @Override
+//                    public void onError(Exception e) {
+//                        Log.i("LogUtils", "onError = "+e.getMessage());
+//                    }
+//                });
 
             }
         });
@@ -166,10 +187,6 @@ public class SendAudioActionFragment extends BaseListenerFragment {
                             sink.write(consumeRecordBytes);
                             sink.flush();
                         }
-                    }
-                    if(BuildConfig.DEBUG){
-                        Log.i(TAG, "Received audio");
-                        Log.i(TAG, "RMSDB: " + rmsdb);
                     }
                 }
 

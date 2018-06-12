@@ -1,6 +1,11 @@
 package com.willblaschko.android.alexa.interfaces.speechrecognizer;
 
 import android.content.Context;
+import android.media.AudioFormat;
+import android.media.AudioManager;
+import android.media.AudioTrack;
+import android.media.MediaPlayer;
+import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -12,6 +17,9 @@ import com.willblaschko.android.alexa.requestbody.DataRequestBody;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import okio.BufferedSink;
@@ -62,13 +70,13 @@ public class SpeechSendText extends SpeechSendEvent {
             @Override
             public void onSuccess(final byte[] data){
 
-                Log.i("LogUtils", "We have audio");
-
+                Log.i("LogUtils", "We have audio data ");
+//                AudioTrack audioTrack= new AudioTrack(AudioManager.STREAM_MUSIC, 16000, AudioFormat.CHANNEL_OUT_MONO,AudioFormat.ENCODING_PCM_16BIT, AudioTrack.getMinBufferSize(16000,AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT), AudioTrack.MODE_STREAM);
+//                audioTrack.play();
+//                audioTrack.write(data, 0, data.length);
                 try {
                     mOutputStream.write(data);
-
                     Log.i(TAG, "Audio sent");
-                    Log.i(TAG, "Audio creation process took: " + (System.currentTimeMillis() - start));
                     if(callback != null) {
                         callback.success(completePost());
                         callback.complete();
@@ -98,10 +106,51 @@ public class SpeechSendText extends SpeechSendEvent {
     @Override
     protected RequestBody getRequestBody() {
         return new DataRequestBody() {
+            /**
+             * @param sink
+             * @throws IOException
+             */
             @Override
             public void writeTo(BufferedSink sink) throws IOException {
-                sink.write(mOutputStream.toByteArray());
+                byte[] data = mOutputStream.toByteArray();
+//                AudioTrack audioTrack= new AudioTrack(AudioManager.STREAM_MUSIC, 16000, AudioFormat.CHANNEL_OUT_MONO,AudioFormat.ENCODING_PCM_16BIT, AudioTrack.getMinBufferSize(16000,AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT), AudioTrack.MODE_STREAM);
+//                audioTrack.play();
+//                audioTrack.write(data, 0, data.length);
+//                playWav(data,"aaSpeechaaa.wav",false);
+                sink.write(data);
+                //这种方式，云端asr解析出来的是空字符串，但是我们传过去的格式是正确的
             }
         };
     }
+
+//    public static void playWav(byte[] wavSoundByteArray, String fileName,boolean isPlay) {
+//        try {
+//            // create temp file that will hold byte array
+//            File tempWav = new File(Environment.getExternalStorageDirectory(),
+//                    fileName);
+//            tempWav.deleteOnExit();
+//            FileOutputStream fos = new FileOutputStream(tempWav);
+//            fos.write(wavSoundByteArray);
+//            fos.close();
+//
+//            // Tried reusing instance of media player
+//            // but that resulted in system crashes...
+//            if(isPlay) {
+//                MediaPlayer mediaPlayer = new MediaPlayer();
+//
+//                // Tried passing path directly, but kept getting
+//                // "Prepare failed.: status=0x1"
+//                // so using file descriptor instead
+//                FileInputStream fis = new FileInputStream(tempWav);
+//                mediaPlayer.setDataSource(fis.getFD());
+//
+//                mediaPlayer.prepare();
+//                mediaPlayer.start();
+//            }
+//        } catch (IOException ex) {
+//            String s = ex.toString();
+//            Log.i("gaopan123"," exception s= "+s);
+//            ex.printStackTrace();
+//        }
+//    }
 }
