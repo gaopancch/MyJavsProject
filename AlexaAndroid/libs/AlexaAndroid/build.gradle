@@ -55,7 +55,6 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:3.0'
     implementation 'com.google.android.gms:play-services-base:9.6.1'
     implementation 'junit:junit:4.12'
-    implementation project(path: ':libs:speechutils-master')
     implementation 'com.squareup.okio:okio:1.14.1'
 }
 

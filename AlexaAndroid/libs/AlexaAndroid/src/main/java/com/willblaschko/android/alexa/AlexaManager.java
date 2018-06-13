@@ -31,9 +31,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-
-import ee.ioc.phon.android.speechutils.TtsProvider;
 import okio.BufferedSink;
+import speechutils.TtsProvider;
 
 import static com.willblaschko.android.alexa.AuthorizationManager.createCodeVerifier;
 import static com.willblaschko.android.alexa.interfaces.response.ResponseParser.getBoundary;

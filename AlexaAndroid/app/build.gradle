@@ -73,8 +73,6 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:24.2.1'
     implementation 'com.android.support:multidex:1.0.1'
     implementation project(path: ':libs:AlexaAndroid')
-    implementation project(path: ':libs:RecorderLevelView')
-    implementation project(path: ':libs:speechutils-master')
     implementation 'com.squareup.okio:okio:1.14.1'
 }
 

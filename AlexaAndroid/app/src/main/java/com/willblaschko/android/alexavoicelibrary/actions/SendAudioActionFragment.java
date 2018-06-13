@@ -26,10 +26,9 @@ import com.willblaschko.android.alexavoicelibrary.R;
 import com.willblaschko.android.recorderview.RecorderView;
 
 import java.io.IOException;
-
-import ee.ioc.phon.android.speechutils.AudioRecorder;
-import ee.ioc.phon.android.speechutils.RawAudioRecorder;
 import okio.BufferedSink;
+import speechutils.AudioRecorder;
+import speechutils.RawAudioRecorder;
 
 
 /**
