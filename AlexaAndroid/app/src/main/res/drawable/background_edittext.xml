@@ -7,7 +7,7 @@
                 android:right="@dimen/view_padding"
                 android:top="@dimen/view_padding"/>
             <corners android:radius="@dimen/corner_radius"/>
-            <solid android:color="@color/white"/>
+            <solid android:color="#ffffff"/>
             <stroke android:width="@dimen/stroke_width"
                 android:color="@color/colorPrimary"/>
         </shape>
@@ -19,7 +19,7 @@
                 android:right="@dimen/view_padding"
                 android:top="@dimen/view_padding"/>
             <corners android:radius="@dimen/corner_radius"/>
-            <solid android:color="@color/white"/>
+            <solid android:color="#ffffff"/>
             <stroke android:width="@dimen/stroke_width"
                 android:color="@color/colorAccent"/>
         </shape>
@@ -31,7 +31,7 @@
                 android:right="@dimen/view_padding"
                 android:top="@dimen/view_padding"/>
             <corners android:radius="@dimen/corner_radius"/>
-            <solid android:color="@color/white"/>
+            <solid android:color="#ffffff"/>
             <stroke android:width="@dimen/stroke_width"
                 android:color="@color/grey"/>
         </shape>

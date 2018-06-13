@@ -9,7 +9,7 @@
                         android:top="15dp"
                         android:right="15dp"/>
                     <solid android:color="@color/colorAccent"/>
-                    <stroke android:width="@dimen/stroke_width" android:color="@color/white"/>
+                    <stroke android:width="@dimen/stroke_width" android:color="#ffffff"/>
                 </shape>
             </item>
             <item android:drawable="@drawable/ic_stat_search">
@@ -26,7 +26,7 @@
                         android:top="15dp"
                         android:right="15dp"/>
                     <solid android:color="@color/colorPrimaryDark"/>
-                    <stroke android:width="@dimen/stroke_width" android:color="@color/white"/>
+                    <stroke android:width="@dimen/stroke_width" android:color="#ffffff"/>
                 </shape>
             </item>
             <item android:drawable="@drawable/ic_stat_search">
