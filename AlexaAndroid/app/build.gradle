@@ -68,11 +68,9 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'junit:junit:4.12'
     implementation 'com.android.support:appcompat-v7:24.2.1'
     implementation 'com.android.support:recyclerview-v7:24.2.1'
     implementation 'com.android.support:multidex:1.0.1'
-    implementation project(path: ':libs:AlexaAndroid')
-    implementation 'com.squareup.okio:okio:1.14.1'
+    implementation project(':JdVoiceAndroid')
 }
 
